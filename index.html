@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f7f5">
+    <meta name="description" content="A privacy-first travel safety and emergency support dashboard.">
+    <title>TravelerGuard AI — Travel safety, with you</title>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://tile.openstreetmap.org">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+    <div id="auth-screen" class="auth-screen">
+      <div class="auth-brand">
+        <div class="brand-mark" aria-hidden="true">T</div>
+        <span>Traveler<span class="brand-accent">Guard</span></span>
+      </div>
+      <div class="auth-card">
+        <p class="eyebrow">YOUR TRAVEL COMPANION</p>
+        <h1 id="auth-title">Travel with more peace of mind.</h1>
+        <p class="muted auth-copy">Keep your trip details, location and emergency tools together. Your location is shared only when you choose to.</p>
+        <form id="auth-form" class="form-stack">
+          <label id="name-field" class="field hidden">Full name<input id="auth-name" autocomplete="name" maxlength="100"></label>
+          <label class="field">Email address<input id="auth-email" type="email" autocomplete="email" required></label>
+          <label class="field">Password<input id="auth-password" type="password" autocomplete="current-password" minlength="10" required></label>
+          <p id="auth-error" class="inline-error" role="alert"></p>
+          <button id="auth-submit" class="button button-primary button-wide" type="submit">Sign in</button>
+        </form>
+        <button id="auth-switch" class="text-button" type="button">New here? Create an account</button>
+        <p class="fine-print"><a href="/admin.html">Administrator portal</a></p>
+        <p class="fine-print">Emergency services may not be contacted by this app. In immediate danger, call your local emergency number.</p>
+      </div>
+    </div>
+
+    <div id="app-shell" class="app-shell hidden">
+      <aside class="sidebar" id="sidebar">
+        <a class="brand" href="#" data-page="dashboard" aria-label="TravelerGuard dashboard">
+          <span class="brand-mark" aria-hidden="true">T</span>
+          <span class="brand-name">Traveler<span class="brand-accent">Guard</span><small>TRAVEL SAFETY</small></span>
+        </a>
+        <div class="nav-label">YOUR SPACE</div>
+        <nav class="main-nav" aria-label="Main navigation">
+          <button class="nav-link active" data-page="dashboard"><span>⌂</span>Overview</button>
+          <button class="nav-link" data-page="trip"><span>↗</span>My trip</button>
+          <button class="nav-link" data-page="map"><span>◎</span>Live map</button>
+          <button class="nav-link" data-page="scanner"><span>▣</span>AI scanner <small class="nav-tag">BETA</small></button>
+          <button class="nav-link" data-page="safety"><span>♡</span>Safety check-in</button>
+          <button class="nav-link" data-page="emergency"><span>!</span>Emergency</button>
+          <div class="nav-label nav-label-spaced">ACCOUNT</div>
+          <button class="nav-link" data-page="history"><span>◷</span>History</button>
+          <button class="nav-link" data-page="profile"><span>◉</span>Profile & contacts</button>
+          <button class="nav-link" data-page="settings"><span>⚙</span>Settings</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="privacy-card"><span class="privacy-icon">✳</span><div><strong>Your privacy matters</strong><p>Tracking stays off until you start it.</p></div></div>
+          <button id="sign-out" class="nav-link sign-out"><span>↪</span>Sign out</button>
+          <div class="user-chip"><div class="avatar" id="user-avatar">T</div><div class="user-meta"><strong id="user-name">Traveler</strong><small id="user-email">Signed in</small></div><span class="user-menu-dot">•••</span></div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <button id="menu-toggle" class="icon-button menu-toggle" aria-label="Open navigation">☰</button>
+          <div class="breadcrumbs"><span>TravelerGuard</span><b>/</b><strong id="page-title">Overview</strong></div>
+          <div class="topbar-right">
+            <span id="network-status" class="status-pill status-neutral"><i></i> Checking connection</span>
+            <button class="icon-button profile-shortcut" data-page="settings" aria-label="Open settings">⚙</button>
+          </div>
+        </header>
+
+        <div id="app-notice" class="app-notice hidden" role="status"></div>
+
+        <section class="page-section active" id="page-dashboard">
+          <div class="welcome-row">
+            <div><p class="eyebrow" id="today-label">YOUR SAFETY, AT A GLANCE</p><h1>Welcome back, <span id="welcome-name">traveler</span></h1><p class="muted">A little more confidence for wherever today takes you.</p></div>
+            <button class="button button-light" data-page="trip">＋ Plan a trip</button>
+          </div>
+          <div class="status-grid">
+            <article class="stat-card"><div class="stat-top"><span>Location sharing</span><span class="stat-symbol mint">◎</span></div><strong id="location-summary">Not active</strong><small id="location-detail">Your location stays private</small><button class="inline-action" id="location-toggle">Share my location <span>→</span></button></article>
+            <article class="stat-card"><div class="stat-top"><span>Trip status</span><span class="stat-symbol violet">↗</span></div><strong id="trip-summary">No active trip</strong><small id="trip-detail">Plan a trip to get started</small><button class="inline-action" data-page="trip">View trip <span>→</span></button></article>
+            <article class="stat-card"><div class="stat-top"><span>Safety check-in</span><span class="stat-symbol amber">♡</span></div><strong id="checkin-summary">All caught up</strong><small id="checkin-detail">Check in whenever you need</small><button class="inline-action" data-page="safety">Check in now <span>→</span></button></article>
+            <article class="stat-card stat-card-sos"><div class="stat-top"><span>Need help now?</span><span class="stat-symbol coral">!</span></div><strong>Emergency support</strong><small>Start emergency mode with a confirmation step</small><button class="inline-action coral-text" data-page="emergency">Open emergency tools <span>→</span></button></article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel map-panel">
+              <div class="panel-heading"><div><p class="eyebrow">LOCATION AWARENESS</p><h2>Your live map</h2></div><button class="button button-small button-light" data-page="map">Open map ↗</button></div>
+              <div class="map-wrap"><div id="dashboard-map" class="map-canvas" aria-label="Map showing your location when sharing is enabled"></div><div id="dashboard-map-placeholder" class="map-placeholder"><div class="placeholder-pin">◎</div><strong>Your location is private</strong><span>Turn on location sharing to see your position here.</span><button class="button button-small button-primary" id="map-enable-location">Enable location</button></div></div>
+              <div class="map-legend"><span><i class="legend-dot"></i> Your location</span><small id="map-accuracy">GPS not active</small></div>
+            </article>
+            <article class="panel trip-panel">
+              <div class="panel-heading"><div><p class="eyebrow">ON YOUR WAY</p><h2>Current trip</h2></div><span id="trip-status-badge" class="badge badge-muted">No trip</span></div>
+              <div id="current-trip-content" class="empty-state compact"><span class="empty-illustration">↗</span><strong>Your next adventure starts here</strong><p>Create a trip to keep destination and check-ins in one place.</p><button class="button button-light button-small" data-page="trip">Plan a trip</button></div>
+              <div id="current-trip-active" class="trip-active hidden"><div class="destination-line"><span class="route-dot"></span><div><small>DESTINATION</small><strong id="trip-destination-label">—</strong></div></div><div class="trip-timing"><div><small>TRIP NAME</small><strong id="trip-name-label">—</strong></div><div><small>EXPECTED ARRIVAL</small><strong id="trip-arrival-label">Not set</strong></div></div><div class="trip-actions"><button class="button button-light button-small" data-page="trip">Manage trip</button><button class="button button-outline button-small" id="trip-pause">Pause trip</button></div></div>
+              <div class="panel-divider"></div>
+              <div class="emergency-contact-mini"><div class="contact-mini-icon">＋</div><div><strong>Emergency contacts</strong><small id="contact-count">No contacts added</small></div><button class="round-arrow" data-page="profile" aria-label="Manage emergency contacts">→</button></div>
+            </article>
+          </div>
+          <div class="disclaimer"><span>ⓘ</span><p><strong>Safety note</strong> TravelerGuard is a support tool, not a replacement for emergency services. GPS, AI and internet services can be inaccurate or unavailable. For immediate danger, contact local emergency services directly.</p></div>
+        </section>
+
+        <section class="page-section" id="page-trip">
+          <div class="page-intro"><p class="eyebrow">TRAVEL PLANS</p><h1>My trip</h1><p class="muted">Plan a journey and choose when to share its location.</p></div>
+          <div class="content-grid">
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">NEW JOURNEY</p><h2>Plan your trip</h2></div></div>
+              <form id="trip-form" class="form-stack">
+                <label class="field">Trip name<input id="trip-name" required maxlength="100" placeholder="e.g. Weekend in Kyoto"></label>
+                <label class="field">Destination<input id="trip-destination" required maxlength="200" placeholder="City, station or address"></label>
+                <label class="field">Expected arrival <span class="optional">Optional</span><input id="trip-arrival" type="datetime-local"></label>
+                <button class="button button-primary" type="submit">Save trip</button>
+              </form>
+            </article>
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">YOUR JOURNEYS</p><h2>Trip history</h2></div></div><div id="trip-list" class="list-stack"><div class="empty-state"><span class="empty-illustration">↗</span><strong>No trips yet</strong><p>Trips you plan will appear here.</p></div></div></article>
+          </div>
+        </section>
+
+        <section class="page-section" id="page-map">
+          <div class="page-intro page-intro-row"><div><p class="eyebrow">LOCATION AWARENESS</p><h1>Live map</h1><p class="muted">Location is collected only while you choose to share it.</p></div><button id="map-tracking-toggle" class="button button-primary">Start sharing location</button></div>
+          <article class="panel full-map-panel"><div id="full-map" class="full-map" aria-label="Interactive map"></div><div id="full-map-placeholder" class="map-placeholder full-map-placeholder"><div class="placeholder-pin">◎</div><strong>Location sharing is off</strong><span>Enable GPS to show your real position. No sample location is displayed.</span></div></article>
+          <article class="panel location-share-panel"><div class="panel-heading"><div><p class="eyebrow">SHARE WITH SOMEONE YOU TRUST</p><h2>Private live-location link</h2></div></div><p class="muted">A private link lets anyone who has it view your latest shared location for up to four hours. Creating a link asks for GPS permission and starts location sharing. Stop sharing below to revoke active links.</p><button id="create-share-link" class="button button-primary">Create link & start sharing</button><div id="location-share-list" class="list-stack share-list"></div></article>
+          <div class="location-detail-row"><div class="info-tile"><small>LOCATION STATUS</small><strong id="full-location-status">Not sharing</strong></div><div class="info-tile"><small>ACCURACY</small><strong id="full-location-accuracy">—</strong></div><div class="info-tile"><small>LAST UPDATED</small><strong id="full-location-time">—</strong></div></div>
+        </section>
+
+        <section class="page-section" id="page-scanner">
+          <div class="page-intro"><p class="eyebrow">IMAGE SCANNER</p><h1>AI scanner <span class="badge badge-beta">BETA</span></h1><p class="muted">Upload or capture an image to automatically read possible number-plate text. OCR runs on this app server; confirm every result against the image.</p></div>
+          <div class="content-grid scanner-grid">
+            <article class="panel scanner-panel"><div class="camera-frame"><video id="camera-video" autoplay playsinline class="hidden"></video><canvas id="capture-canvas" class="hidden"></canvas><div id="camera-empty" class="camera-empty"><span>▣</span><strong>Your camera preview</strong><small>Camera access starts only after you tap below.</small></div><div id="camera-error" class="camera-error hidden" role="status"></div></div>            <div class="camera-actions"><button id="camera-start" class="button button-light">Start camera</button><button id="camera-capture" class="button button-outline" disabled>Capture</button><button id="camera-stop" class="button button-outline" disabled>Stop</button><label class="button button-outline upload-button">Upload image<input id="image-upload" type="file" accept="image/jpeg,image/png,image/webp"></label></div><div class="scanner-actions"><button id="scan-detect" class="button button-primary" disabled>Run object detection</button><button id="scan-ocr" class="button button-light" disabled>Re-scan plate text</button></div></article>
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">SCAN RESULTS</p><h2 id="scan-result-title">Ready when you are</h2></div></div><div id="scan-results" class="scan-results"><div class="empty-state"><span class="empty-illustration">✳</span><strong>No scan yet</strong><p>Upload or capture an image to scan it. No sample results are shown.</p></div></div><p class="scanner-note">Possible plate text is an OCR guess, not verified registration data. This app does not look up vehicle owners or retrieve official vehicle records.</p></article>
+          </div>
+        </section>
+
+        <section class="page-section" id="page-safety">
+          <div class="page-intro"><p class="eyebrow">A MOMENT FOR YOU</p><h1>Safety check-in</h1><p class="muted">Let yourself record that you're okay. A check-in never calls emergency services.</p></div>
+          <article class="panel checkin-panel"><div class="checkin-orbit">♡</div><p class="eyebrow">YOUR WELLBEING COMES FIRST</p><h2>How are you doing?</h2><p class="muted">Tap when you're ready. Your check-in is saved privately to your account.</p><button id="checkin-button" class="button button-primary">I'm safe</button><p id="last-checkin" class="fine-print">No check-in recorded in this session yet.</p></article>
+          <article class="disclaimer"><span>ⓘ</span><p><strong>Check-in reminder</strong> This app does not automatically call emergency services or alert contacts if a check-in is missed. Set up a separate trusted check-in plan if you need one.</p></article>
+        </section>
+
+        <section class="page-section" id="page-emergency">
+          <div class="page-intro"><p class="eyebrow">HELP WHEN YOU NEED IT</p><h1>Emergency support</h1><p class="muted">Starting emergency mode records an event. Development/test mode never sends messages; configured production mode attempts an SMS to saved contacts.</p></div>
+          <article class="emergency-hero"><div class="emergency-orb">!</div><div><p class="eyebrow">EMERGENCY MODE</p><h2 id="emergency-heading">Need immediate help?</h2><p id="emergency-copy">Use the button only if you need to record an emergency event. Confirm before activation. The app cannot contact emergency services.</p></div><button id="sos-button" class="sos-button"><span>HOLD TO</span><strong>SOS</strong><small>3 seconds</small></button></article>
+          <div class="emergency-columns"><article class="panel"><div class="panel-heading"><div><p class="eyebrow">WHAT HAPPENS</p><h2>Know before you activate</h2></div></div><ul class="check-list"><li>Your emergency event and available coordinates are saved to your account.</li><li>Development/test mode never sends messages. In production, a configured Twilio service attempts SMS to your saved contacts.</li><li>A provider's acceptance of an SMS does not confirm delivery.</li><li>This app cannot call emergency services. Contact your local service directly for immediate danger.</li></ul><div id="emergency-event-status" class="inline-status">No active emergency event.</div><button id="cancel-sos" class="button button-outline hidden">End emergency mode</button></article>
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">PEOPLE YOU TRUST</p><h2>Emergency contacts</h2></div><button class="button button-small button-light" data-page="profile">Manage</button></div><div id="emergency-contact-list" class="list-stack"><div class="empty-state compact"><strong>No emergency contacts yet</strong><p>Add someone you trust in Profile & contacts.</p></div></div></article></div>
+          <article class="panel history-panel"><div class="panel-heading"><div><p class="eyebrow">SMS REPLIES</p><h2>Contact messages</h2></div><button id="refresh-sms-inbox" class="button button-small button-light">Refresh</button></div><div id="sms-inbox" class="list-stack"><div class="empty-state compact"><strong>No replies recorded</strong><p>Verified SMS replies to an active event appear here.</p></div></div></article>
+        </section>
+
+        <section class="page-section" id="page-history">
+          <div class="page-intro page-intro-row"><div><p class="eyebrow">YOUR ACCOUNT DATA</p><h1>History</h1><p class="muted">Your trips and emergency events. You can delete trip records individually.</p></div><button id="refresh-history" class="button button-light">Refresh</button></div>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">RECENT JOURNEYS</p><h2>Trips</h2></div></div><div id="history-trips" class="list-stack"></div></article>
+          <article class="panel history-panel"><div class="panel-heading"><div><p class="eyebrow">EMERGENCY RECORDS</p><h2>Emergency events</h2></div></div><div id="history-events" class="list-stack"></div></article>
+        </section>
+
+        <section class="page-section" id="page-profile">
+          <div class="page-intro"><p class="eyebrow">YOUR ACCOUNT</p><h1>Profile & contacts</h1><p class="muted">Keep the information you need close at hand.</p></div>
+          <div class="content-grid"><article class="panel"><div class="panel-heading"><div><p class="eyebrow">PERSONAL DETAILS</p><h2>Your profile</h2></div></div><form id="profile-form" class="form-stack"><label class="field">Full name<input id="profile-name" required maxlength="100"></label><label class="field">Email address<input id="profile-email" type="email" disabled></label><button class="button button-primary" type="submit">Save changes</button></form></article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">PEOPLE YOU TRUST</p><h2>Emergency contacts</h2></div></div><form id="contact-form" class="form-stack contact-form"><label class="field">Name<input id="contact-name" required maxlength="100" placeholder="Contact name"></label><label class="field">Phone number<input id="contact-phone" type="tel" required maxlength="30" placeholder="+1 555 0100"></label><label class="field">Relationship<input id="contact-relationship" maxlength="60" placeholder="Friend, family…"></label><label class="field">Email <span class="optional">Optional</span><input id="contact-email" type="email" maxlength="254" placeholder="name@example.com"></label><button class="button button-light" type="submit">＋ Add contact</button></form><div id="contacts-list" class="list-stack"></div><p class="fine-print">Contacts are stored in your account. No messages are sent by this development build.</p></article></div>
+        </section>
+
+        <section class="page-section" id="page-settings">
+          <div class="page-intro"><p class="eyebrow">MAKE IT YOURS</p><h1>Settings</h1><p class="muted">Choose what stays on and what stays private.</p></div>
+          <article class="panel settings-panel"><div class="panel-heading"><div><p class="eyebrow">PRIVACY CONTROLS</p><h2>Your data, your choice</h2></div></div>
+            <div class="setting-row"><div><strong>Location tracking</strong><small>Location is sent only while active. Stop sharing at any time.</small></div><span id="setting-location" class="setting-state">OFF</span></div>
+            <div class="setting-row"><div><strong>Trip history</strong><small>Trips you create are saved to your account so you can manage them.</small></div><span class="setting-state state-on">ON</span></div>
+            <div class="setting-row"><div><strong>AI scan storage</strong><small>Images and scan results are not stored by this development build.</small></div><span class="setting-state">OFF</span></div>
+            <div class="setting-row"><div><strong>OCR result storage</strong><small>Text results are shown only in this session and are not saved.</small></div><span class="setting-state">OFF</span></div>
+            <div class="setting-row"><div><strong>Emergency history</strong><small>Emergency mode records are kept in your account.</small></div><span class="setting-state state-on">ON</span></div>
+            <div class="setting-row"><div><strong>Analytics</strong><small>No analytics tracking is configured.</small></div><span class="setting-state">OFF</span></div>
+            <div class="setting-row setting-danger"><div><strong>Delete account and personal data</strong><small>Permanently removes this account, trips, contacts, location and emergency records.</small></div><button id="delete-account" class="button button-outline">Delete account</button></div>
+          </article>
+          <article class="disclaimer"><span>ⓘ</span><p><strong>Service status</strong> Maps require internet. YOLO and OCR require local model/software setup. Emergency notifications are disabled unless a production provider is deliberately configured.</p></article>
+        </section>
+
+        <footer class="app-footer"><span>TravelerGuard AI</span><span>Travel safety, with you.</span><button id="footer-disclaimer" class="text-button">Safety disclaimer</button></footer>
+      </main>
+    </div>
+    <div id="confirm-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-card"><div class="modal-icon">!</div><h2 id="modal-title">Confirm emergency mode</h2><p>This records the event. If production Twilio SMS is configured, it will attempt to text your saved contacts with available location information. Delivery is not guaranteed, and the app cannot call emergency services. For immediate danger, call local emergency services directly.</p><div class="modal-actions"><button id="modal-cancel" class="button button-light">Not now</button><button id="modal-confirm" class="button button-danger">Activate emergency</button></div></div></div>
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="/js/app.js" defer></script>
+  </body>
+</html>
