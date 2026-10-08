@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f7f5">
+    <meta name="description" content="Private administrator portal for locally managed vehicle records.">
+    <title>Administrator portal — TravelerGuard</title>
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+    <main class="auth-screen">
+      <div class="auth-brand">
+        <div class="brand-mark" aria-hidden="true">T</div>
+        <span>Traveler<span class="brand-accent">Guard</span></span>
+      </div>
+      <section id="admin-login-view" class="auth-card">
+        <p class="eyebrow">RESTRICTED ACCESS</p>
+        <h1>Administrator sign in</h1>
+        <p class="muted auth-copy">Sign in to manage this site's private, locally entered vehicle records.</p>
+        <form id="admin-login-form" class="form-stack">
+          <label class="field">Username<input id="admin-username" autocomplete="username" required maxlength="100"></label>
+          <label class="field">Password<input id="admin-password" type="password" autocomplete="current-password" required maxlength="128"></label>
+          <p id="admin-login-error" class="inline-error" role="alert"></p>
+          <button id="admin-login-submit" class="button button-primary button-wide" type="submit">Sign in</button>
+        </form>
+        <p class="fine-print"><a href="/">Back to TravelerGuard</a></p>
+      </section>
+
+      <section id="admin-records-view" class="admin-records-view hidden">
+        <div class="page-intro page-intro-row">
+          <div><p class="eyebrow">PRIVATE ADMINISTRATION</p><h1>Vehicle records</h1><p class="muted">Records are entered and stored in this site's database. No external vehicle registry is queried.</p></div>
+          <button id="admin-sign-out" class="button button-light" type="button">Sign out</button>
+        </div>
+        <div class="content-grid">
+          <article class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">ADD RECORD</p><h2>Vehicle details</h2></div></div>
+            <form id="vehicle-form" class="form-stack">
+              <label class="field">Registration / plate number<input id="vehicle-plate" required maxlength="24" autocomplete="off"></label>
+              <label class="field">Owner name<input id="vehicle-owner" required maxlength="100"></label>
+              <label class="field">Make<input id="vehicle-make" maxlength="60"></label>
+              <label class="field">Model<input id="vehicle-model" maxlength="60"></label>
+              <label class="field">Color<input id="vehicle-color" maxlength="40"></label>
+              <label class="field">Region / jurisdiction<input id="vehicle-region" maxlength="80"></label>
+              <label class="field">Notes<input id="vehicle-notes" maxlength="500"></label>
+              <p id="vehicle-form-error" class="inline-error" role="alert"></p>
+              <button id="vehicle-submit" class="button button-primary" type="submit">Add vehicle record</button>
+            </form>
+          </article>
+          <article class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">PRIVATE DATABASE</p><h2>Saved records</h2></div></div>
+            <label class="field">Upload plate image for OCR lookup<input id="admin-plate-image" type="file" accept="image/jpeg,image/png,image/webp"></label>
+            <div id="plate-match-results" class="list-stack" aria-live="polite"></div>
+            <form id="vehicle-search-form" class="form-stack">
+              <label class="field">Find by plate number<input id="vehicle-search" maxlength="24" autocomplete="off"></label>
+              <div class="camera-actions"><button class="button button-light" type="submit">Search</button><button id="vehicle-show-all" class="button button-outline" type="button">Show all</button></div>
+            </form>
+            <p id="vehicle-list-error" class="inline-error" role="alert"></p>
+            <div id="vehicle-list" class="list-stack" aria-live="polite"></div>
+          </article>
+        </div>
+        <p class="scanner-note">Plate text can be misread. Keep these records accurate, private, and limited to information you are authorized to manage.</p>
+      </section>
+    </main>
+    <div id="admin-toast" class="toast hidden" role="status" aria-live="polite"></div>
+    <script src="/js/admin.js" defer></script>
+  </body>
+</html>

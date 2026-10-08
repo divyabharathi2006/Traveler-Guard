@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="no-referrer">
+    <meta name="theme-color" content="#f4f7f5">
+    <title>Shared location — TravelerGuard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+      body{min-height:100vh;padding:28px 16px}.share-page{max-width:760px;margin:auto}.share-heading{margin:0 0 15px}.share-map{height:min(65vh,520px);min-height:300px;position:relative;overflow:hidden;background:#e8efeb;border:1px solid #e5ece7;border-radius:12px}.share-status{font-size:11px;color:#73827a;margin:11px 2px}.share-coordinate{font-size:10px;color:#607268;margin:0 2px}.share-footer{font-size:9px;color:#88958e;line-height:1.6;margin-top:18px}.share-fallback{display:grid;place-content:center;text-align:center;min-height:300px;color:#6a7b71}.share-fallback strong{font-size:13px}.share-fallback span{font-size:10px;margin-top:5px}
+    </style>
+  </head>
+  <body>
+    <main class="share-page">
+      <div class="auth-brand"><div class="brand-mark" aria-hidden="true">T</div><span>Traveler<span class="brand-accent">Guard</span></span></div>
+      <header class="share-heading"><p class="eyebrow">PRIVATE LOCATION SHARE</p><h1>Shared live location</h1><p class="muted">This private link expires automatically. Only the latest location shared by the traveler is shown.</p></header>
+      <section class="share-map" aria-label="Traveler's shared location map"><div id="share-map" class="map-canvas hidden"></div><div id="share-fallback" class="share-fallback"><strong>Loading shared location…</strong><span>Please wait.</span></div></section>
+      <p id="share-status" class="share-status" role="status">Connecting…</p>
+      <p id="share-coordinate" class="share-coordinate"></p>
+      <p class="share-footer">Location can be inaccurate or out of date. TravelerGuard is not an emergency service. If you believe someone is in immediate danger, contact them and local emergency services directly. <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">Map data © OpenStreetMap contributors</a>.</p>
+    </main>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="/js/share.js" defer></script>
+  </body>
+</html>
